@@ -579,52 +579,54 @@ function! <SID>GotoBuffer(cmd, bang) "{{{1
 endfunction   " GotoBuffer
 
 function! <SID>UpdateList(event) "{{{1
-  " Function to update the window list with info about the current buffer
-  let DebugF = 'UpdateList'
-  call s:Debug(1, DebugF, 'Entering(' . a:event . '): win = ' . winnr() . ', buf = ' . bufnr('%') . ' (' . bufname('%') . ')')
-  if !exists('w:BufKillList')
-    let w:BufKillList = []
-  endif
-  if !exists('w:BufKillColumnList')
-    let w:BufKillColumnList = []
-  endif
-  if !exists('w:BufKillIndex')
-    let w:BufKillIndex = -1
-  endif
-  call s:Debug(2, DebugF, 'w:BufKillList')
-  call s:Debug(2, DebugF, 'w:BufKillColumnList')
-  call s:Debug(2, DebugF, 'w:BufKillIndex')
-  let bufferNum = bufnr('%')
-
-  if (w:BufKillIndex == -1) || (w:BufKillList[w:BufKillIndex] != bufferNum)
-    " Increment index
-    let w:BufKillIndex += 1
-    if w:BufKillIndex < len(w:BufKillList)
-      " The branch is diverging, remove the end of the list
-      call remove(w:BufKillList, w:BufKillIndex, -1)
-      " Same for column list
-      if w:BufKillIndex < len(w:BufKillColumnList)
-        call remove(w:BufKillColumnList, w:BufKillIndex, -1)
-      endif
+  try
+    " Function to update the window list with info about the current buffer
+    let DebugF = 'UpdateList'
+    call s:Debug(1, DebugF, 'Entering(' . a:event . '): win = ' . winnr() . ', buf = ' . bufnr('%') . ' (' . bufname('%') . ')')
+    if !exists('w:BufKillList')
+      let w:BufKillList = []
     endif
-    " Now remove any pre-existing instances of the buffer in the list
-    let existingIndex = index(w:BufKillList, bufferNum)
-    if existingIndex != -1
-      call remove(w:BufKillList, existingIndex)
-      let w:BufKillIndex -= 1
-      if existingIndex < len(w:BufKillColumnList)
-        call remove(w:BufKillColumnList, existingIndex)
-      endif
+    if !exists('w:BufKillColumnList')
+      let w:BufKillColumnList = []
     endif
-    " Now add the buffer to the list, at the end
-    let w:BufKillList += [bufferNum]
-  endif
+    if !exists('w:BufKillIndex')
+      let w:BufKillIndex = -1
+    endif
+    call s:Debug(2, DebugF, 'w:BufKillList')
+    call s:Debug(2, DebugF, 'w:BufKillColumnList')
+    call s:Debug(2, DebugF, 'w:BufKillIndex')
+    let bufferNum = bufnr('%')
 
-  call s:Debug(2, DebugF, 'w:BufKillList')
-  call s:Debug(2, DebugF, 'w:BufKillColumnList')
-  call s:Debug(2, DebugF, 'w:BufKillIndex')
-  call s:Debug(1, DebugF, 'Exiting (' . a:event . '): ', 'w:BufKillList')
-  " redraw  " To hide call Debug messages for now!
+    if (w:BufKillIndex == -1) || (w:BufKillList[w:BufKillIndex] != bufferNum)
+      " Increment index
+      let w:BufKillIndex += 1
+      if w:BufKillIndex < len(w:BufKillList)
+        " The branch is diverging, remove the end of the list
+        call remove(w:BufKillList, w:BufKillIndex, -1)
+        " Same for column list
+        if w:BufKillIndex < len(w:BufKillColumnList)
+          call remove(w:BufKillColumnList, w:BufKillIndex, -1)
+        endif
+      endif
+      " Now remove any pre-existing instances of the buffer in the list
+      let existingIndex = index(w:BufKillList, bufferNum)
+      if existingIndex != -1
+        call remove(w:BufKillList, existingIndex)
+        let w:BufKillIndex -= 1
+        if existingIndex < len(w:BufKillColumnList)
+          call remove(w:BufKillColumnList, existingIndex)
+        endif
+      endif
+      " Now add the buffer to the list, at the end
+      let w:BufKillList += [bufferNum]
+    endif
+
+    call s:Debug(2, DebugF, 'w:BufKillList')
+    call s:Debug(2, DebugF, 'w:BufKillColumnList')
+    call s:Debug(2, DebugF, 'w:BufKillIndex')
+    call s:Debug(1, DebugF, 'Exiting (' . a:event . '): ', 'w:BufKillList')
+    " redraw  " To hide call Debug messages for now!
+  endtry
 endfunction   " UpdateList
 
 function! <SID>UpdateLastColumn(event) "{{{1
